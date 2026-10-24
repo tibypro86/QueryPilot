@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QueryPilot — Data Analyst Agent</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+:root{--bg:#f5f7fb;--panel:#fff;--ink:#19233a;--muted:#748098;--line:#e5eaf2;--purple:#6258e8;--purple2:#8277ff;--teal:#13a78b;--red:#d64e64;--soft:#f0efff;--shadow:0 8px 28px rgba(30,45,80,.045)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px 'DM Sans',system-ui,sans-serif}button,textarea{font:inherit}button{cursor:pointer}button:focus-visible,textarea:focus-visible{outline:3px solid #a8a1ff;outline-offset:2px}a{color:inherit;text-decoration:none}.hidden{display:none!important}
+.sidebar{position:fixed;inset:0 auto 0 0;width:244px;background:#fff;border-right:1px solid var(--line);padding:25px 16px;display:flex;flex-direction:column;z-index:5}.brand{display:flex;align-items:center;gap:11px;padding:0 7px;font:800 17px Manrope,sans-serif;letter-spacing:-.6px}.brand-mark{width:38px;height:38px;display:grid;place-items:center;background:linear-gradient(140deg,#7669fa,#4b44c8);color:#fff;border-radius:12px;font-size:22px;box-shadow:0 6px 14px #6258e82e}.brand small{display:block;font:700 8px 'DM Sans',sans-serif;letter-spacing:1.4px;color:#8a93a8;margin-top:3px}.workspace-label{font-size:10px;letter-spacing:1.5px;font-weight:700;color:#9ba4b6;margin:43px 12px 12px}.side-link{border:0;background:transparent;text-align:left;display:flex;align-items:center;gap:12px;padding:12px 13px;margin:3px 0;border-radius:9px;color:#78839a;font-weight:600}.side-link span{width:20px;text-align:center;font-size:17px}.side-link:hover,.side-link.active{background:#f0efff;color:var(--purple)}.side-link.active{box-shadow:inset 3px 0 var(--purple)}.sidebar-bottom{margin-top:auto;border:1px solid var(--line);border-radius:12px;padding:13px 10px;display:flex;align-items:center;gap:10px}.secure-icon{width:31px;height:31px;border-radius:10px;background:#e7f8f3;color:#159a7c;display:grid;place-items:center;font-weight:800}.sidebar-bottom strong{font-size:11px;display:block}.sidebar-bottom small{display:block;color:var(--muted);font-size:10px;margin-top:4px}
+.main{margin-left:244px;padding:0 36px 22px;max-width:1700px}.topbar{height:70px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);margin-bottom:28px}.breadcrumb{font-size:12px;color:#8b95a9}.breadcrumb span{margin:0 10px;color:#c4cad6}.breadcrumb b{color:#39445a;font-weight:600}.user-menu{display:flex;align-items:center;gap:9px;font-size:11px;color:#69758c}.online-dot{display:inline-block;width:7px;height:7px;background:#20b990;border-radius:50%;box-shadow:0 0 0 3px #20b9901a}.user-avatar{display:grid;place-items:center;background:#eae8ff;color:#5e55d9;border-radius:50%;width:31px;height:31px;font-weight:800;margin-left:5px}.mobile-brand{display:none}
+.page-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 23px}.overline{font-size:10px;letter-spacing:1.5px;color:#858fa5;font-weight:800;margin-bottom:9px}.phase-tag{background:#e9e7ff;color:#5f55d9;padding:4px 7px;border-radius:5px;font-size:8px;margin-left:8px;letter-spacing:1px}.page-heading h1{font:800 clamp(26px,3vw,36px) Manrope,sans-serif;letter-spacing:-1.4px;margin:0}.page-heading h1 em{font-style:normal;color:var(--purple)}.subheading{color:#7d879c;margin:9px 0 0;line-height:1.6;font-size:12px}.connection{white-space:nowrap;display:flex;align-items:center;gap:8px;color:#7c879a;font-size:10px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:9px 11px}
+.stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-bottom:19px}.stat-card,.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow)}.stat-card{padding:16px 18px}.stat-top{display:flex;justify-content:space-between;align-items:center;color:#7d879b;font-size:11px}.stat-icon{width:29px;height:29px;display:grid;place-items:center;background:#f0efff;color:var(--purple);border-radius:9px;font-size:16px}.stat-card>strong{display:block;font:800 20px Manrope,sans-serif;margin:10px 0 4px;letter-spacing:-.4px}.stat-card>small{font-size:10px;color:#9ba4b5}
+.content-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:17px}.card{padding:21px;min-width:0}.card-title{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:21px}.card-title>div{display:flex;align-items:flex-start;gap:11px}.step{width:32px;height:32px;flex-shrink:0;display:grid;place-items:center;border-radius:9px;background:#f0efff;color:#6258e8;font-size:11px;font-weight:800}.card-title h2,.results-header h2{font:800 16px Manrope,sans-serif;margin:0;letter-spacing:-.35px}.card-title p{margin:6px 0 0;color:#8a94a8;font-size:11px;line-height:1.5}.soft-badge{white-space:nowrap;background:#f3f5f9;color:#8a94a7;font-size:8px;letter-spacing:1px;padding:7px 8px;border-radius:5px;font-weight:800}label{display:block;font-size:11px;font-weight:700;margin-bottom:9px;color:#3c4860}textarea{width:100%;resize:vertical;min-height:111px;border:1px solid #dfe4ee;border-radius:9px;padding:13px 14px;background:#fbfcfe;color:#202a40;line-height:1.65;font-size:12px}textarea::placeholder{color:#a6afbf}textarea:focus{outline:none;border-color:#8c83f4;box-shadow:0 0 0 3px #6258e812}.input-meta{display:flex;justify-content:space-between;color:#9ba4b5;font-size:9px;margin-top:7px}.examples-label{font-size:9px;color:#9ba4b5;font-weight:800;letter-spacing:1px;margin:20px 0 9px}.example-chips{display:flex;flex-wrap:wrap;gap:7px}.example-chip{background:#fff;border:1px solid #e1e5ef;color:#69758b;border-radius:7px;padding:8px 9px;font-size:10px;transition:.2s}.example-chip:hover{border-color:#a59eff;background:#f8f7ff;color:#5f55d9}.form-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}.btn-primary,.btn-secondary{border-radius:8px;padding:10px 13px;font-size:11px;font-weight:700;transition:.2s}.btn-primary{background:var(--purple);color:#fff;border:1px solid var(--purple);box-shadow:0 4px 10px #6258e824}.btn-primary:hover{background:#5147d5;transform:translateY(-1px)}.btn-primary:disabled{opacity:.6;cursor:wait;transform:none}.btn-secondary{background:#fff;color:#66728a;border:1px solid #e0e5ee}.btn-secondary:hover:not(:disabled){background:#f7f8fc;border-color:#cbd2e1}.btn-secondary:disabled{opacity:.4;cursor:not-allowed}.safety-note{display:flex;gap:10px;align-items:center;background:#f4fbf8;border:1px solid #e2f4ed;border-radius:9px;padding:11px;margin-top:19px}.safety-note>span{color:#169b7c;font-size:18px}.safety-note strong{display:block;font-size:10px;color:#347d6c}.safety-note small{display:block;font-size:9px;color:#83a49a;margin-top:3px;line-height:1.5}
+.pipeline-card{display:flex;flex-direction:column}.pipeline{margin-top:3px}.pipeline-row{display:flex;align-items:center;gap:11px;padding:14px 0;border-bottom:1px solid #eff1f6}.pipeline-row:last-child{border-bottom:0}.pipeline-icon{width:33px;height:33px;border-radius:10px;display:grid;place-items:center;background:#f2f4f9;color:#8d98ac;font-size:16px;flex-shrink:0}.pipeline-row strong{display:block;font-size:11px;font-weight:700}.pipeline-row small{display:block;color:#9aa3b4;font-size:9px;margin-top:4px}.stage-status{margin-left:auto;color:#a3abba;font-size:9px;white-space:nowrap}.pipeline-row.running .pipeline-icon{background:#eeedff;color:#655ae7}.pipeline-row.running .stage-status{color:#6258e8}.pipeline-row.done .pipeline-icon{background:#e6f8f1;color:#159b7d}.pipeline-row.done .stage-status{color:#159b7d}.pipeline-row.failed .pipeline-icon{background:#fff0f1;color:#d64e64}.pipeline-row.failed .stage-status{color:#d64e64}.pipeline-foot{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:17px;color:#98a1b3;font-size:10px}.pulse{width:7px;height:7px;border-radius:50%;background:#c6cbd5}.pulse.active{background:#6258e8;box-shadow:0 0 0 4px #6258e81a}
+.results-card{margin-top:18px}.results-header{display:flex;justify-content:space-between;align-items:center;gap:15px}.results-header h2{font-size:18px}.result-actions{display:flex;gap:7px}.empty-results,.loading-results{min-height:218px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}.empty-art{width:49px;height:49px;border-radius:15px;background:#f0efff;color:#756be9;display:grid;place-items:center;font-size:25px}.empty-results h3,.loading-results strong{font:800 13px Manrope,sans-serif;margin:13px 0 5px}.empty-results p,.loading-results p{font-size:11px;color:#929caf;margin:0;line-height:1.6}.loader{width:26px;height:26px;border:3px solid #e7e5ff;border-top-color:#6258e8;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.error-box{background:#fff1f2;border:1px solid #ffd8dd;color:#b63e52;padding:14px;border-radius:9px;margin-top:18px;line-height:1.6;font-size:12px}.answer-results{padding-top:21px}.answer-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;color:#939caf;font-size:10px}.success-pill{color:#168567;background:#e7f8f1;border-radius:6px;padding:6px 8px;font-size:9px;font-weight:800}.answer-results h3{font:800 19px Manrope,sans-serif;margin:16px 0 8px}.answer-results>p{color:#58657b;line-height:1.75;font-size:12px;margin:0 0 16px}.clarification-box{padding:13px;background:#fff8e8;border:1px solid #f5e4b5;color:#89621c;border-radius:9px;margin:12px 0;font-size:12px;line-height:1.6}.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:9px;margin-top:13px}.table-wrap:empty{display:none}table{border-collapse:collapse;width:100%;font-size:11px;white-space:nowrap}th{text-align:left;background:#f7f8fc;color:#77829a;font-weight:700}th,td{padding:11px 13px;border-bottom:1px solid #edf0f5}td{color:#4c5870}tbody tr:last-child td{border-bottom:0}.table-note{color:#8d98aa;font-size:10px;margin-top:8px}.sql-panel{margin-top:17px;border:1px solid var(--line);border-radius:9px;overflow:hidden}.sql-heading{display:flex;justify-content:space-between;align-items:center;padding:11px 13px;background:#f7f8fc;font-size:10px}.sql-heading span{color:#8f99ab}.sql-panel pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;padding:14px;background:#11182b;color:#c6d5f4;font:11px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace}.evidence-row{display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--line);margin-top:16px;padding-top:13px;color:#8d98aa;font-size:10px;line-height:1.6}.evidence-row>span:first-child{white-space:nowrap;color:#6258e8}.evidence-row b{color:#59657b}
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:17px}.bottom-grid .card{display:flex;gap:13px;padding:17px}.mini-icon{flex-shrink:0;width:34px;height:34px;border-radius:10px;background:#f0efff;color:#655ae7;display:grid;place-items:center;font-size:18px}.mini-icon.shield{background:#e8f8f2;color:#169a7c}.bottom-grid h3{margin:2px 0 6px;font:800 12px Manrope,sans-serif}.bottom-grid p{font-size:10px;line-height:1.6;color:#8b96a9;margin:0}.inline-action{border:0;background:transparent;padding:10px 0 0;color:#6258e8;font-size:10px;font-weight:800;text-align:left}footer{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);margin-top:28px;padding:17px 0;color:#8590a5;font-size:10px}.muted{color:#a3acbb}
+.schema-card,.history-card{margin-top:15px}.schema-list details{border:1px solid var(--line);border-radius:9px;margin-top:10px;overflow:hidden}.schema-list summary{padding:14px;cursor:pointer;font-weight:700;font-size:12px;display:flex;gap:10px;align-items:center;list-style:none}.schema-list summary span{color:#6258e8}.schema-list summary small{margin-left:auto;color:#9aa3b4;font-weight:500}.columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:0 14px 14px}.columns span{background:#f7f8fc;border-radius:6px;padding:10px;font:11px ui-monospace,monospace}.columns i{display:block;font:9px 'DM Sans',sans-serif;color:#929caf;margin-top:5px}.schema-warning{margin-top:17px;background:#fff8e8;color:#8d6b2d;border-radius:8px;padding:12px;font-size:10px;line-height:1.6}.history-item{padding:15px 0;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}.history-item:last-child{border-bottom:0}.history-mark{width:31px;height:31px;border-radius:9px;background:#f0efff;color:#6258e8;display:grid;place-items:center}.history-item strong{font-size:12px;display:block}.history-item small{display:block;margin-top:6px;color:#8d98aa;font-size:10px}.history-item button{margin-left:auto}
+@media(max-width:1100px){.main{padding-left:24px;padding-right:24px}.sidebar{width:218px}.main{margin-left:218px}.content-grid{grid-template-columns:1fr}.pipeline-card{min-height:330px}.pipeline-foot{margin-top:20px}}
+@media(max-width:700px){.sidebar{position:static;width:100%;height:auto;padding:13px 16px;border-right:0;border-bottom:1px solid var(--line)}.workspace-label,.side-link,.sidebar-bottom{display:none}.main{margin:0;padding:0 14px 16px}.topbar{height:55px;margin-bottom:23px}.mobile-brand{display:flex;align-items:center;gap:8px;font:800 13px Manrope,sans-serif}.mobile-brand .brand-mark{width:29px;height:29px;font-size:16px;border-radius:9px}.breadcrumb{display:none}.role-label{display:none}.page-heading{align-items:flex-start;flex-direction:column}.connection{align-self:flex-start}.stats-grid{gap:8px}.stat-card{padding:12px}.stat-card>strong{font-size:15px}.stat-top{font-size:9px}.stat-card>small{font-size:9px}.content-grid{grid-template-columns:minmax(0,1fr)}.card{padding:16px}.card-title{flex-wrap:wrap}.soft-badge{display:none}.bottom-grid{grid-template-columns:1fr}.results-header{align-items:flex-start;flex-direction:column}.result-actions{width:100%}.result-actions button{flex:1}.answer-topline{align-items:flex-start;flex-direction:column}.columns{grid-template-columns:1fr}footer{flex-direction:column;line-height:1.6}}
+
+
+/* User-selectable dark theme */
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0d1220;--panel:#151c2d;--ink:#e7ebf5;--muted:#9aa6bd;--line:#293349;--purple:#8b82ff;--purple2:#a59eff;--soft:#242342;--shadow:0 8px 28px rgba(0,0,0,.18)}
+:root[data-theme="dark"] body{background:var(--bg);color:var(--ink)}
+:root[data-theme="dark"] .sidebar,:root[data-theme="dark"] .connection,:root[data-theme="dark"] .btn-secondary,:root[data-theme="dark"] .example-chip,:root[data-theme="dark"] .upload-drop{background:var(--panel);color:var(--ink);border-color:var(--line)}
+:root[data-theme="dark"] .side-link{color:#a7b1c6}:root[data-theme="dark"] .side-link:hover,:root[data-theme="dark"] .side-link.active{background:#272544;color:#b6b0ff}
+:root[data-theme="dark"] .breadcrumb b,:root[data-theme="dark"] label{color:#d8deec}
+:root[data-theme="dark"] textarea,:root[data-theme="dark"] input[type="text"],:root[data-theme="dark"] .upload-drop{background:#101727;color:var(--ink);border-color:var(--line)}
+:root[data-theme="dark"] textarea::placeholder{color:#7f8ba3}
+:root[data-theme="dark"] .pipeline-row{border-color:#293349}:root[data-theme="dark"] .pipeline-icon{background:#222b40;color:#b3bdd0}
+:root[data-theme="dark"] .soft-badge,:root[data-theme="dark"] .stat-icon,:root[data-theme="dark"] .step,:root[data-theme="dark"] .empty-art{background:#282645;color:#b4adff}
+:root[data-theme="dark"] .safety-note{background:#142c2a;border-color:#234640}:root[data-theme="dark"] .safety-note strong{color:#8ed7c3}:root[data-theme="dark"] .safety-note small{color:#8aafa6}
+:root[data-theme="dark"] .example-chip:hover{background:#282645;color:#c0bbff}:root[data-theme="dark"] .table-wrap{border-color:var(--line)}:root[data-theme="dark"] th{background:#202a3e;color:#cdd5e5}:root[data-theme="dark"] td{border-color:#293349}:root[data-theme="dark"] tr:nth-child(even) td{background:#182134}
+:root[data-theme="dark"] .answer-results>p,:root[data-theme="dark"] .card-title p,:root[data-theme="dark"] .subheading{color:#a6b1c7}:root[data-theme="dark"] .sidebar-bottom{border-color:var(--line)}:root[data-theme="dark"] .user-avatar{background:#302c57;color:#c5c0ff}
+:root[data-theme="dark"] .schema-list details,:root[data-theme="dark"] .columns span,:root[data-theme="dark"] .history-item{background:#182134;border-color:var(--line);color:var(--ink)}
+:root[data-theme="dark"] .schema-warning{background:#30291b;border-color:#514329;color:#e6c98d}:root[data-theme="dark"] .clarification-box{background:#30291b;border-color:#514329;color:#e6c98d}:root[data-theme="dark"] .error-box{background:#351e2a;border-color:#603044;color:#ffb3c0}
+.theme-toggle{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:8px 11px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:7px}.topbar-right{display:flex;align-items:center;gap:14px}
+.source-card{margin-bottom:18px;padding:17px 20px}.source-card .card-title{margin-bottom:12px}.upload-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}.upload-drop{display:flex;align-items:center;gap:12px;min-height:78px;padding:14px;border:1px dashed #cbd2e2;border-radius:10px;background:#fbfcff;cursor:pointer}.upload-drop:hover,.upload-drop.dragover{border-color:var(--purple);background:var(--soft)}.upload-symbol{font-size:23px;color:var(--purple)}.upload-drop strong{display:block;font-size:11px}.upload-drop small{display:block;color:var(--muted);font-size:10px;margin-top:4px;line-height:1.5}.upload-status{margin-top:9px;font-size:10px;color:var(--muted);line-height:1.5}.upload-status.error{color:#d64e64}.upload-status.success{color:#159b7d}.file-name{font-weight:700;color:var(--ink)}
+@media(max-width:700px){.topbar-right{gap:7px}.theme-toggle{padding:7px 8px}.upload-row{grid-template-columns:1fr}.upload-row .btn-primary{width:100%}.source-card{padding:15px}}
+
+
+/* QueryPilot visual refresh: midnight blue + white dark mode, gold + white + black light mode */
+:root{--bg:#f8f8f6;--panel:#ffffff;--ink:#111318;--muted:#65666d;--line:#e7e4dc;--purple:#b58a2a;--purple2:#d2ad53;--soft:#fbf4df;--shadow:0 12px 30px rgba(18,20,25,.07);--gold:#c39a3b;--gold-light:#f6e9bf}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#071326;--panel:#0d2039;--ink:#f4f7fc;--muted:#a5b6ce;--line:#1d3858;--purple:#76b9ff;--purple2:#a1d2ff;--soft:#112b4b;--shadow:0 16px 40px rgba(0,0,0,.28);--gold:#d7b35c}
+body{background:radial-gradient(ellipse at 85% 0%,rgba(195,154,59,.06),transparent 35%),var(--bg);transition:background .35s,color .35s}
+:root[data-theme="dark"] body{background:radial-gradient(ellipse at 85% 0%,rgba(46,119,190,.17),transparent 38%),radial-gradient(ellipse at 5% 40%,rgba(27,69,117,.13),transparent 32%),var(--bg)}
+.sidebar{background:var(--panel);border-color:var(--line);box-shadow:8px 0 35px rgba(4,15,33,.025);backdrop-filter:blur(18px)}
+.brand-mark{background:linear-gradient(145deg,#e3c36c,#9b741e);color:#101114;box-shadow:0 8px 20px rgba(181,138,42,.28);transform:translateZ(18px)}
+:root[data-theme="dark"] .brand-mark{background:linear-gradient(145deg,#dceeff,#4387c8);color:#061326;box-shadow:0 8px 24px rgba(63,147,226,.25)}
+.side-link{color:var(--muted);transition:transform .22s,background .22s,color .22s}
+.side-link:hover{transform:translateX(3px)}
+.side-link:hover,.side-link.active{background:var(--soft);color:var(--purple)}
+.side-link.active{box-shadow:inset 3px 0 var(--purple)}
+.page-heading h1 em{color:var(--purple)}
+.phase-tag{background:var(--soft);color:var(--purple)}
+.card,.stat-card{border-color:var(--line);box-shadow:var(--shadow);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;transform-style:preserve-3d;will-change:transform}
+.card:hover,.stat-card:hover{box-shadow:0 20px 45px rgba(12,25,46,.12);border-color:color-mix(in srgb,var(--purple) 35%,var(--line))}
+:root[data-theme="dark"] .card:hover,:root[data-theme="dark"] .stat-card:hover{box-shadow:0 24px 48px rgba(0,0,0,.3),0 0 0 1px rgba(118,185,255,.07)}
+.step,.stat-icon,.mini-icon,.empty-art{background:var(--soft);color:var(--purple)}
+.btn-primary{background:linear-gradient(135deg,#d9b65e,#b18424);border-color:#b18424;color:#111318;box-shadow:0 8px 18px rgba(181,138,42,.22);transition:transform .2s,box-shadow .2s,filter .2s}
+.btn-primary:hover{background:linear-gradient(135deg,#e7c977,#bd922e);filter:saturate(1.08);transform:translateY(-2px);box-shadow:0 12px 24px rgba(181,138,42,.3)}
+:root[data-theme="dark"] .btn-primary{background:linear-gradient(135deg,#d9edff,#7dbcf0);border-color:#7dbcf0;color:#071326;box-shadow:0 8px 22px rgba(74,151,220,.2)}
+:root[data-theme="dark"] .btn-primary:hover{background:linear-gradient(135deg,#edf7ff,#9dd0ff);box-shadow:0 12px 28px rgba(74,151,220,.28)}
+.btn-secondary{background:var(--panel);color:var(--ink);border-color:var(--line)}
+.example-chip{background:var(--panel);border-color:var(--line);color:var(--muted);transition:transform .2s,border-color .2s,background .2s}
+.example-chip:hover{border-color:var(--purple);background:var(--soft);color:var(--ink);transform:translateY(-2px)}
+textarea{background:color-mix(in srgb,var(--panel) 90%,var(--bg));color:var(--ink);border-color:var(--line)}
+:root[data-theme="dark"] textarea,:root[data-theme="dark"] input[type="text"]{background:#07182d;border-color:#254364;color:#f4f7fc}
+:root[data-theme="dark"] .sidebar,:root[data-theme="dark"] .connection,:root[data-theme="dark"] .btn-secondary,:root[data-theme="dark"] .example-chip,:root[data-theme="dark"] .upload-drop{background:var(--panel);color:var(--ink);border-color:var(--line)}
+:root[data-theme="dark"] .side-link:hover,:root[data-theme="dark"] .side-link.active{background:#132e4e;color:#a8d6ff}
+:root[data-theme="dark"] .breadcrumb b,:root[data-theme="dark"] label{color:#e7f0fc}
+:root[data-theme="dark"] .soft-badge,:root[data-theme="dark"] .stat-icon,:root[data-theme="dark"] .step,:root[data-theme="dark"] .empty-art{background:#153657;color:#a8d6ff}
+:root[data-theme="dark"] .pipeline-row{border-color:var(--line)}:root[data-theme="dark"] .pipeline-icon{background:#142d49;color:#b9d8f5}
+:root[data-theme="dark"] .example-chip:hover{background:#163858;color:#fff}
+:root[data-theme="dark"] .table-wrap{border-color:var(--line)}:root[data-theme="dark"] th{background:#17314f;color:#e5f0ff}:root[data-theme="dark"] td{border-color:var(--line)}:root[data-theme="dark"] tr:nth-child(even) td{background:#102641}
+:root[data-theme="dark"] .answer-results>p,:root[data-theme="dark"] .card-title p,:root[data-theme="dark"] .subheading{color:#b0c1d7}
+:root[data-theme="dark"] .schema-list details,:root[data-theme="dark"] .columns span,:root[data-theme="dark"] .history-item{background:#102641;border-color:var(--line);color:var(--ink)}
+:root[data-theme="dark"] .user-avatar{background:#173b5e;color:#d8edff}
+:root[data-theme="dark"] .upload-drop:hover,:root[data-theme="dark"] .upload-drop.dragover{background:#163858;border-color:#76b9ff}
+.theme-toggle{box-shadow:0 4px 12px rgba(15,25,45,.05);transition:transform .2s,border-color .2s}
+.theme-toggle:hover{transform:translateY(-2px);border-color:var(--purple)}
+.upload-drop{transition:transform .22s,border-color .22s,background .22s;transform-style:preserve-3d}
+.upload-drop:hover{transform:translateY(-2px)}
+.safety-note{background:color-mix(in srgb,#1aa483 7%,var(--panel));border-color:color-mix(in srgb,#1aa483 18%,var(--line))}
+:root[data-theme="dark"] .safety-note{background:#0e302f;border-color:#245452}
+.connection{box-shadow:inset 0 1px rgba(255,255,255,.5)}
+:root[data-theme="dark"] .connection{box-shadow:inset 0 1px rgba(255,255,255,.025)}
+/* Ambient 3D lighting and accessible motion */
+.main{position:relative;isolation:isolate}
+.main:before{content:"";position:fixed;right:3vw;top:14vh;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,rgba(195,154,59,.08),transparent 70%);filter:blur(10px);pointer-events:none;z-index:-1}
+:root[data-theme="dark"] .main:before{background:radial-gradient(circle,rgba(65,143,216,.13),transparent 70%)}
+.btn-primary:active,.btn-secondary:active,.theme-toggle:active{transform:translateY(1px) scale(.985)}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+.groq-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:14px}.groq-input-wrap label{margin-bottom:8px}.groq-input-line{display:flex;gap:8px}.groq-input-line input{width:100%;min-width:0;border:1px solid var(--line);border-radius:9px;padding:11px 12px;background:color-mix(in srgb,var(--panel) 90%,var(--bg));color:var(--ink);font:12px 'DM Sans',sans-serif}.groq-input-line input:focus{outline:2px solid color-mix(in srgb,var(--purple) 50%,transparent);border-color:var(--purple)}.groq-help{display:block;margin-top:7px;color:var(--muted);font-size:10px;line-height:1.5}.groq-actions{display:flex;gap:8px}.groq-actions button{white-space:nowrap}.groq-status-key{color:#159b7d}.groq-card{margin-bottom:19px}
+@media(max-width:700px){.groq-row{grid-template-columns:1fr}.groq-actions{display:grid;grid-template-columns:1fr 1fr}.groq-input-line input{font-size:11px}}
+
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#"><span class="brand-mark">Q</span><span>QueryPilot<small>DATA INTELLIGENCE</small></span></a>
+    <div class="workspace-label">WORKSPACE</div>
+    <button class="side-link active" data-view="ask"><span>✳</span> Ask your data</button>
+    <button class="side-link" data-view="schema"><span>▦</span> Schema explorer</button>
+    <button class="side-link" data-view="history"><span>◷</span> Query history</button>
+    <div class="sidebar-bottom">
+      <div class="secure-icon">✓</div><div><strong>Governed workspace</strong><small>Role-based access enabled</small></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="mobile-brand"><span class="brand-mark">Q</span> QueryPilot</div>
+      <div class="breadcrumb">Workspace <span>/</span> <b id="crumb">Ask your data</b></div>
+      <div class="topbar-right"><button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch theme"><span id="themeIcon">☾</span><span id="themeLabel">Dark mode</span></button><div class="user-menu"><span class="online-dot"></span><span class="role-label">Analyst role</span><span class="user-avatar">A</span></div></div>
+    </header>
+
+    <section id="view-ask" class="view">
+      <div class="page-heading">
+        <div><div class="overline">DATA ANALYST AGENT <span class="phase-tag">PHASE 2</span></div>
+          <h1>Ask questions. <em>Get answers.</em></h1>
+          <p class="subheading">Explore your database using plain English—with SQL you can inspect and results you can trust.</p>
+        </div>
+        <div class="connection"><span class="online-dot"></span><span id="connectionText">API connection not checked</span></div>
+      </div>
+
+      <section class="card source-card" aria-labelledby="sourceTitle">
+        <div class="card-title"><div><span class="step">DB</span><div><h2 id="sourceTitle">Add your database</h2><p>Upload a supported file to send it to your connected Java backend.</p></div></div><span class="soft-badge">YOUR DATA SOURCE</span></div>
+        <div class="upload-row">
+          <label class="upload-drop" id="uploadDrop" for="databaseFile"><span class="upload-symbol">⇧</span><span><strong id="uploadTitle">Choose a database file or drag it here</strong><small>Supported: .db, .sqlite, .sqlite3, .csv, .json, .sql · Max 25 MB</small></span></label>
+          <input id="databaseFile" type="file" accept=".db,.sqlite,.sqlite3,.csv,.json,.sql" hidden>
+          <button class="btn-primary" type="button" id="uploadDatabaseBtn" disabled>Upload database →</button>
+        </div>
+        <div id="uploadStatus" class="upload-status" role="status">No file selected. Upload requires the backend endpoint <code>/api/database/upload</code>.</div>
+      </section>
+
+      <section class="card source-card groq-card" aria-labelledby="groqTitle">
+        <div class="card-title"><div><span class="step">AI</span><div><h2 id="groqTitle">Groq API configuration</h2><p>Add your own Groq API key to power AI analysis through your Java backend.</p></div></div><span class="soft-badge">OPTIONAL · BYOK</span></div>
+        <div class="groq-row">
+          <div class="groq-input-wrap"><label for="groqApiKey">Groq API key</label><div class="groq-input-line"><input id="groqApiKey" type="password" autocomplete="off" spellcheck="false" placeholder="gsk_••••••••••••••••••••••••" aria-describedby="groqHelp"><button class="btn-secondary reveal-key" type="button" id="toggleGroqVisibility" aria-label="Show API key">Show</button></div><small id="groqHelp" class="groq-help">Kept in page memory only; it is not saved to localStorage or sent directly to Groq from this page.</small></div>
+          <div class="groq-actions"><button class="btn-primary" type="button" id="saveGroqKeyBtn">Use key</button><button class="btn-secondary" type="button" id="clearGroqKeyBtn">Clear</button></div>
+        </div>
+        <div id="groqStatus" class="upload-status" role="status">No custom key added. Your backend may use its server-configured key.</div>
+      </section>
+
+      <div class="stats-grid">
+        <article class="stat-card"><div class="stat-top"><span>Active data source</span><span class="stat-icon">▤</span></div><strong id="sourceStat">School database</strong><small>Demo workspace</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Current role</span><span class="stat-icon">♙</span></div><strong id="roleStat">Analyst</strong><small>Scoped permissions</small></article>
+        <article class="stat-card"><div class="stat-top"><span>Queries this session</span><span class="stat-icon">⌁</span></div><strong id="queryCount">0</strong><small>Since page opened</small></article>
+      </div>
+
+      <div class="content-grid">
+        <section class="card ask-card">
+          <div class="card-title"><div><span class="step">01</span><div><h2>Ask your database</h2><p>Use natural language to describe what you want to know.</p></div></div><span class="soft-badge">NATURAL LANGUAGE</span></div>
+          <form id="askForm">
+            <label for="question">Your question</label>
+            <textarea id="question" rows="4" placeholder="e.g. Which schools had falling enrolment last year?" required></textarea>
+            <div class="input-meta"><span id="questionCount">0 characters</span><span>Follow-ups retain context</span></div>
+            <div class="examples-label">TRY AN EXAMPLE</div>
+            <div class="example-chips">
+              <button type="button" class="example-chip" data-question="Which schools had falling enrolment last year?">↘ Falling enrolment</button>
+              <button type="button" class="example-chip" data-question="Compare total enrolment by district for 2023.">▥ Enrolment by district</button>
+              <button type="button" class="example-chip" data-question="Now only for 2023">↳ Follow-up: only 2023</button>
+            </div>
+            <div class="form-actions">
+              <button type="button" id="clearBtn" class="btn-secondary">Clear</button>
+              <button type="submit" id="askBtn" class="btn-primary"><span>✦</span> Run analysis <span>→</span></button>
+            </div>
+          </form>
+          <div class="safety-note"><span>♧</span><div><strong>Governed by your role</strong><small>Only permitted rows and columns should be returned by the backend.</small></div></div>
+        </section>
+
+        <section class="card pipeline-card">
+          <div class="card-title"><div><span class="step">02</span><div><h2>Analysis pipeline</h2><p>Inspect each stage of the query lifecycle.</p></div></div></div>
+          <div class="pipeline" id="pipeline">
+            <div class="pipeline-row" data-stage="schema"><span class="pipeline-icon">▦</span><div><strong>Discover schema</strong><small>Find relevant tables and columns</small></div><span class="stage-status">Waiting</span></div>
+            <div class="pipeline-row" data-stage="generate"><span class="pipeline-icon">⌘</span><div><strong>Generate SQL</strong><small>Translate question into a query</small></div><span class="stage-status">Waiting</span></div>
+            <div class="pipeline-row" data-stage="validate"><span class="pipeline-icon">✓</span><div><strong>Validate permissions</strong><small>Check access and query safety</small></div><span class="stage-status">Waiting</span></div>
+            <div class="pipeline-row" data-stage="execute"><span class="pipeline-icon">▶</span><div><strong>Execute & verify</strong><small>Run query and check results</small></div><span class="stage-status">Waiting</span></div>
+          </div>
+          <div class="pipeline-foot"><span class="pulse"></span><span id="pipelineMessage">Ready when you are</span></div>
+        </section>
+      </div>
+
+      <section class="card results-card" id="resultsSection">
+        <div class="results-header"><div><div class="overline">03 / OUTPUT</div><h2>Answer & evidence</h2></div><div class="result-actions"><button id="copyAnswerBtn" class="btn-secondary" disabled>Copy answer</button><button id="toggleSqlBtn" class="btn-secondary" disabled>View SQL</button></div></div>
+        <div id="emptyResults" class="empty-results"><div class="empty-art">⌕</div><h3>Your answer will appear here</h3><p>Ask a question to see the response, evidence, and query details.</p></div>
+        <div id="loadingResults" class="loading-results hidden"><span class="loader"></span><strong>Analyzing your question…</strong><p>Waiting for the query pipeline to finish.</p></div>
+        <div id="errorResults" class="error-box hidden" role="alert"></div>
+        <div id="answerResults" class="answer-results hidden">
+          <div class="answer-topline"><span class="success-pill">✓ Query completed</span><span id="resultMeta">Demo result</span></div>
+          <h3 id="answerTitle">Key findings</h3><p id="answerText"></p>
+          <div id="clarificationBox" class="clarification-box hidden"></div>
+          <div class="table-wrap"><table id="dataTable"><thead></thead><tbody></tbody></table></div>
+          <div id="tableNote" class="table-note"></div>
+          <div id="sqlPanel" class="sql-panel hidden"><div class="sql-heading"><strong>Generated SQL</strong><span>Read-only preview</span></div><pre><code id="sqlCode"></code></pre></div>
+          <div class="evidence-row"><span>◈ <b>Evidence</b></span><span id="evidenceText">Result source details will appear here.</span></div>
+        </div>
+      </section>
+
+      <section class="bottom-grid">
+        <div class="card followup-card"><div class="mini-icon">↳</div><div><h3>Ask a follow-up</h3><p>Continue the conversation without repeating your context.</p><button class="inline-action" id="followupBtn">Try “Now only for 2023” →</button></div></div>
+        <div class="card trust-card"><div class="mini-icon shield">✓</div><div><h3>Safety & transparency</h3><p>Surface permission denials, ambiguous questions, and schema changes rather than guessing.</p><button class="inline-action" data-view-link="schema">Explore data schema →</button></div></div>
+      </section>
+      <footer><span>QueryPilot <span class="muted">· Answers grounded in your data</span></span><span>Hackathon prototype · Verify outputs before decisions</span></footer>
+    </section>
+
+    <section id="view-schema" class="view hidden">
+      <div class="page-heading"><div><div class="overline">DATA SOURCE</div><h1>Schema <em>explorer.</em></h1><p class="subheading">Preview available tables and columns. The Java backend should return the real, permission-filtered schema.</p></div></div>
+      <div class="card schema-card"><div class="card-title"><div><span class="step">DB</span><div><h2>School database</h2><p>Illustrative schema for the demo</p></div></div><button class="btn-secondary" id="refreshSchemaBtn">Refresh schema</button></div>
+        <div class="schema-list">
+          <details open><summary><span>▤</span> schools <small>4 columns</small></summary><div class="columns"><span>school_id <i>INTEGER · PK</i></span><span>school_name <i>TEXT</i></span><span>district <i>TEXT</i></span><span>school_type <i>TEXT</i></span></div></details>
+          <details><summary><span>▤</span> enrolment <small>4 columns</small></summary><div class="columns"><span>school_id <i>INTEGER</i></span><span>academic_year <i>INTEGER</i></span><span>student_count <i>INTEGER</i></span><span>updated_at <i>DATE</i></span></div></details>
+          <details><summary><span>▤</span> districts <small>3 columns</small></summary><div class="columns"><span>district_id <i>INTEGER · PK</i></span><span>district_name <i>TEXT</i></span><span>region <i>TEXT</i></span></div></details>
+        </div>
+        <p class="schema-warning">Demo schema only. Replace with the actual schema endpoint before presenting live database capabilities.</p>
+      </div>
+      <footer><span>QueryPilot <span class="muted">· Answers grounded in your data</span></span><span>Hackathon prototype</span></footer>
+    </section>
+
+    <section id="view-history" class="view hidden">
+      <div class="page-heading"><div><div class="overline">SESSION</div><h1>Query <em>history.</em></h1><p class="subheading">Review the questions asked during this browser session.</p></div><button id="clearHistoryBtn" class="btn-secondary">Clear history</button></div>
+      <div class="card history-card"><div id="historyList" class="history-list"><div class="empty-results"><div class="empty-art">◷</div><h3>No queries yet</h3><p>Your recent questions will appear here.</p></div></div></div>
+      <footer><span>QueryPilot <span class="muted">· Answers grounded in your data</span></span><span>Hackathon prototype</span></footer>
+    </section>
+  </main>
+  <script>
+// QueryPilot AI-02 frontend. Update API_BASE to match Himesh's Java backend.
+const API_BASE = "http://localhost:8080/api";
+const ANALYZE_URL = `${API_BASE}/analyze`;
+const SCHEMA_URL = `${API_BASE}/schema`;
+
+const $ = (id) => document.getElementById(id);
+const form = $("askForm");
+const questionInput = $("question");
+const askBtn = $("askBtn");
+let queryCount = 0;
+let lastAnswer = null;
+let lastQuestion = "";
+let history = [];
+let abortController = null;
+// Custom Groq key is held in memory only and cleared on page reload.
+let groqApiKey = "";
+
+const demoRows = [
+  { school_name: "Government Senior Secondary School", district: "North District", previous_year: 1240, current_year: 1098, change_pct: "-11.5%" },
+  { school_name: "Central Public School", district: "East District", previous_year: 980, current_year: 901, change_pct: "-8.1%" },
+  { school_name: "Model Higher Secondary", district: "West District", previous_year: 870, current_year: 832, change_pct: "-4.4%" }
+];
+
+function setResultState(state) {
+  $("emptyResults").classList.toggle("hidden", state !== "empty");
+  $("loadingResults").classList.toggle("hidden", state !== "loading");
+  $("errorResults").classList.toggle("hidden", state !== "error");
+  $("answerResults").classList.toggle("hidden", state !== "answer");
+}
+function setPipeline(stage) {
+  const order = ["schema", "generate", "validate", "execute"];
+  const labels = { schema: "Discover schema", generate: "Generate SQL", validate: "Validate permissions", execute: "Execute & verify" };
+  document.querySelectorAll(".pipeline-row").forEach(row => {
+    const name = row.dataset.stage, index = order.indexOf(name), activeIndex = order.indexOf(stage);
+    row.classList.remove("running", "done", "failed");
+    const status = row.querySelector(".stage-status");
+    if (stage === "failed" && name === window.failedStage) {
+      row.classList.add("failed"); status.textContent = "Blocked";
+    } else if (stage === "complete" || (activeIndex >= 0 && index < activeIndex)) {
+      row.classList.add("done"); status.textContent = "Complete";
+    } else if (name === stage) {
+      row.classList.add("running"); status.textContent = "In progress";
+    } else {
+      status.textContent = "Waiting";
+    }
+  });
+  $("pipelineMessage").textContent = stage === "complete" ? "Analysis complete" :
+    stage === "failed" ? "Pipeline stopped — inspect the error" :
+    stage ? `${labels[stage] || "Working"}…` : "Ready when you are";
+  $("pipelineMessage").previousElementSibling.classList.toggle("active", Boolean(stage && stage !== "complete" && stage !== "failed"));
+}
+function showError(message) {
+  $("errorResults").textContent = message || "Something went wrong. Check the Java backend and try again.";
+  setResultState("error");
+  $("connectionText").textContent = "Request failed";
+}
+function escapeText(value) {
+  return String(value ?? "");
+}
+function normalizeRows(data) {
+  if (Array.isArray(data.rows)) return data.rows;
+  if (Array.isArray(data.data)) return data.data;
+  if (Array.isArray(data.results)) return data.results;
+  return [];
+}
+function renderTable(rows) {
+  const table = $("dataTable"), head = table.querySelector("thead"), body = table.querySelector("tbody");
+  head.replaceChildren(); body.replaceChildren();
+  if (!rows.length) { table.closest(".table-wrap").classList.add("hidden"); return; }
+  table.closest(".table-wrap").classList.remove("hidden");
+  const keys = [...new Set(rows.flatMap(row => Object.keys(row || {})))].slice(0, 12);
+  const headerRow = document.createElement("tr");
+  keys.forEach(key => { const th = document.createElement("th"); th.textContent = key.replaceAll("_", " "); headerRow.appendChild(th); });
+  head.appendChild(headerRow);
+  rows.slice(0, 50).forEach(row => {
+    const tr = document.createElement("tr");
+    keys.forEach(key => { const td = document.createElement("td"); td.textContent = escapeText(row?.[key]); tr.appendChild(td); });
+    body.appendChild(tr);
+  });
+  $("tableNote").textContent = rows.length > 50 ? `Showing first 50 of ${rows.length} rows.` : `${rows.length} row(s) returned.`;
+}
+function renderAnswer(data, {demo = false, question = ""} = {}) {
+  lastAnswer = data;
+  const answer = data.answer ?? data.summary ?? data.message ?? "The query completed. See the results below.";
+  $("answerTitle").textContent = data.title || "Answer";
+  $("answerText").textContent = answer;
+  $("resultMeta").textContent = demo ? "Illustrative demo data — not a live database" : (data.executionTime ? `Completed in ${data.executionTime}` : "Backend response");
+  const clarification = data.clarificationQuestion || data.clarification_question;
+  if (data.needsClarification || clarification) {
+    $("clarificationBox").textContent = clarification || "Could you clarify the time period, metric, or group you mean?";
+    $("clarificationBox").classList.remove("hidden");
+  } else {
+    $("clarificationBox").classList.add("hidden");
+  }
+  renderTable(normalizeRows(data));
+  const sql = data.sql || data.generatedSql || data.generated_sql || "";
+  $("sqlCode").textContent = sql || "No SQL was returned by the backend.";
+  $("toggleSqlBtn").disabled = !sql;
+  $("sqlPanel").classList.add("hidden");
+  $("toggleSqlBtn").textContent = "View SQL";
+  $("copyAnswerBtn").disabled = false;
+  $("evidenceText").textContent = data.evidence || data.source || (demo ? "Sample records embedded in frontend; not evidence from a real database." : "Backend did not include evidence metadata.");
+  setResultState("answer");
+  setPipeline("complete");
+  $("connectionText").textContent = demo ? "Demo mode · Java API not connected" : "Java API responded";
+  queryCount++;
+  $("queryCount").textContent = queryCount;
+  history.unshift({ question, answer, demo, at: new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}) });
+  renderHistory();
+}
+function renderHistory() {
+  const host = $("historyList");
+  host.replaceChildren();
+  if (!history.length) {
+    host.innerHTML = '<div class="empty-results"><div class="empty-art">◷</div><h3>No queries yet</h3><p>Your recent questions will appear here.</p></div>';
+    return;
+  }
+  history.forEach((item, index) => {
+    const row = document.createElement("div"); row.className = "history-item";
+    const mark = document.createElement("div"); mark.className = "history-mark"; mark.textContent = "⌕";
+    const content = document.createElement("div"); content.style.minWidth = "0";
+    const title = document.createElement("strong"); title.textContent = item.question;
+    const meta = document.createElement("small"); meta.textContent = `${item.at} · ${item.demo ? "Demo data" : "Backend result"} · ${String(item.answer).slice(0, 130)}`;
+    const reopen = document.createElement("button"); reopen.className = "btn-secondary"; reopen.textContent = "Ask again";
+    reopen.addEventListener("click", () => { questionInput.value = item.question; questionInput.dispatchEvent(new Event("input")); switchView("ask"); questionInput.focus(); });
+    content.append(title, meta); row.append(mark, content, reopen); host.appendChild(row);
+  });
+}
+function demoResponse(question) {
+  const lower = question.toLowerCase();
+  const isFollowup = lower.includes("only for 2023") || lower.includes("for 2023");
+  return {
+    title: isFollowup ? "Enrolment results — 2023" : "Schools with falling enrolment",
+    answer: isFollowup
+      ? "Illustrative demo: the sample view is filtered to the 2023 period. Connect the Java API to query real records and preserve follow-up context."
+      : "Illustrative demo: 3 sample schools show declining enrolment. These rows are hard-coded for interface testing and are not results from your database.",
+    rows: isFollowup ? demoRows.slice(0, 2) : demoRows,
+    sql: isFollowup
+      ? "SELECT school_name, district, student_count\nFROM enrolment\nWHERE academic_year = 2023\nORDER BY student_count DESC;"
+      : "SELECT s.school_name, s.district,\n       prev.student_count AS previous_year,\n       curr.student_count AS current_year\nFROM schools s\nJOIN enrolment prev ON prev.school_id = s.school_id\nJOIN enrolment curr ON curr.school_id = s.school_id\nWHERE curr.academic_year = prev.academic_year + 1\n  AND curr.student_count < prev.student_count\nORDER BY (curr.student_count - prev.student_count) ASC\nLIMIT 100;",
+    evidence: "Illustrative rows only. Replace with backend-provided source tables, filters, and row counts."
+  };
+}
+async function submitQuestion(question) {
+  const q = question.trim();
+  if (!q) { questionInput.focus(); return; }
+  lastQuestion = q;
+  $("clarificationBox").classList.add("hidden");
+  $("sqlPanel").classList.add("hidden");
+  setResultState("loading");
+  askBtn.disabled = true; askBtn.textContent = "Analyzing…";
+  $("connectionText").textContent = "Contacting Java API…";
+  const stages = ["schema", "generate", "validate", "execute"];
+  let stageIndex = 0;
+  const advanceStage = () => { if (stageIndex < stages.length) setPipeline(stages[stageIndex++]); };
+  advanceStage();
+  const stageTimer = setInterval(advanceStage, 550);
+  window.failedStage = "validate";
+  abortController = new AbortController();
+  const timeout = setTimeout(() => abortController.abort(), 18000);
+  try {
+    // Contract suggestion for Himesh:
+    // POST /api/analyze { "question": "...", "conversationId": "optional" }
+    // Response: { answer, sql, rows, evidence, needsClarification, clarificationQuestion }
+    const response = await fetch(ANALYZE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(groqApiKey ? { "X-Groq-API-Key": groqApiKey } : {})
+      },
+      body: JSON.stringify({ question: q, conversationId: sessionStorage.getItem("querypilotConversationId") || null }),
+      signal: abortController.signal
+    });
+    if (!response.ok) {
+      let details = "";
+      try { details = (await response.json()).message || ""; } catch {}
+      throw new Error(details || `Java API returned HTTP ${response.status}`);
+    }
+    const data = await response.json();
+    if (data.conversationId) sessionStorage.setItem("querypilotConversationId", data.conversationId);
+    clearInterval(stageTimer); clearTimeout(timeout);
+    renderAnswer(data, { question: q });
+  } catch (err) {
+    clearInterval(stageTimer); clearTimeout(timeout);
+    if (err.name === "AbortError") {
+      window.failedStage = "execute"; setPipeline("failed");
+      showError("The Java API did not respond within 18 seconds. Check that the server is running and the endpoint is correct.");
+    } else if (err instanceof TypeError) {
+      // Intentional local UI fallback; label it clearly as demo data.
+      renderAnswer(demoResponse(q), { demo: true, question: q });
+    } else {
+      window.failedStage = err.message.includes("403") || err.message.toLowerCase().includes("permission") ? "validate" : "execute";
+      setPipeline("failed");
+      showError(err.message + " — Check the API URL, CORS configuration, and backend logs. This request was not replaced with fabricated live results.");
+    }
+  } finally {
+    askBtn.disabled = false; askBtn.innerHTML = "<span>✦</span> Run analysis <span>→</span>";
+    abortController = null;
+  }
+}
+// Theme preference: persist in this browser when localStorage is available.
+const themeToggle = $("themeToggle");
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  const dark = theme === "dark";
+  $("themeIcon").textContent = dark ? "☀" : "☾";
+  $("themeLabel").textContent = dark ? "Light mode" : "Dark mode";
+  themeToggle.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+  try { localStorage.setItem("querypilot-theme", theme); } catch {}
+}
+let initialTheme = "light";
+try { initialTheme = localStorage.getItem("querypilot-theme") || "light"; } catch {}
+applyTheme(initialTheme);
+themeToggle.addEventListener("click", () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark"));
+
+// Database upload UI. The Spring backend must implement POST /api/database/upload
+// and safely validate/import the file; a browser-only page cannot attach a DB to Java by itself.
+const databaseFile = $("databaseFile");
+const uploadButton = $("uploadDatabaseBtn");
+const uploadDrop = $("uploadDrop");
+const uploadStatus = $("uploadStatus");
+let selectedDatabaseFile = null;
+const allowedExtensions = ["db", "sqlite", "sqlite3", "csv", "json", "sql"];
+function setUploadStatus(message, type = "") {
+  uploadStatus.textContent = message;
+  uploadStatus.className = `upload-status ${type}`.trim();
+}
+function selectDatabaseFile(file) {
+  if (!file) return;
+  const extension = (file.name.split(".").pop() || "").toLowerCase();
+  if (!allowedExtensions.includes(extension)) {
+    selectedDatabaseFile = null; uploadButton.disabled = true; databaseFile.value = "";
+    $("uploadTitle").textContent = "Choose a database file or drag it here";
+    setUploadStatus("Unsupported file type. Choose .db, .sqlite, .sqlite3, .csv, .json, or .sql.", "error"); return;
+  }
+  if (file.size > 25 * 1024 * 1024) {
+    selectedDatabaseFile = null; uploadButton.disabled = true; databaseFile.value = "";
+    setUploadStatus("File exceeds 25 MB. Please choose a smaller file.", "error"); return;
+  }
+  selectedDatabaseFile = file; uploadButton.disabled = false;
+  $("uploadTitle").textContent = file.name;
+  setUploadStatus(`${(file.size / 1024 / 1024).toFixed(2)} MB selected. Click Upload database to send it to your backend.`);
+}
+databaseFile.addEventListener("change", () => selectDatabaseFile(databaseFile.files?.[0]));
+["dragenter", "dragover"].forEach(eventName => uploadDrop.addEventListener(eventName, event => { event.preventDefault(); uploadDrop.classList.add("dragover"); }));
+["dragleave", "drop"].forEach(eventName => uploadDrop.addEventListener(eventName, event => { event.preventDefault(); uploadDrop.classList.remove("dragover"); }));
+uploadDrop.addEventListener("drop", event => selectDatabaseFile(event.dataTransfer?.files?.[0]));
+uploadButton.addEventListener("click", async () => {
+  if (!selectedDatabaseFile) return;
+  const formData = new FormData(); formData.append("file", selectedDatabaseFile);
+  uploadButton.disabled = true; uploadButton.textContent = "Uploading…";
+  setUploadStatus("Uploading file to the Java backend…");
+  try {
+    const response = await fetch(`${API_BASE}/database/upload`, { method: "POST", body: formData });
+    const bodyText = await response.text();
+    let result = {}; try { result = bodyText ? JSON.parse(bodyText) : {}; } catch { result = { message: bodyText }; }
+    if (!response.ok) throw new Error(result.message || result.error || `HTTP ${response.status}`);
+    const sourceName = result.sourceName || result.databaseName || result.name || selectedDatabaseFile.name;
+    $("sourceStat").textContent = sourceName;
+    const small = $("sourceStat").parentElement.querySelector("small"); if (small) small.textContent = "User-provided data source";
+    $("connectionText").textContent = "User database connected";
+    setUploadStatus(result.message || `Uploaded ${selectedDatabaseFile.name}. Backend response received; refresh schema to inspect available tables.`, "success");
+    selectedDatabaseFile = null; databaseFile.value = ""; $("uploadTitle").textContent = "Choose a database file or drag it here";
+  } catch (error) {
+    setUploadStatus(`Upload failed: ${error.message}. The backend must implement POST ${API_BASE}/database/upload and allow this page through CORS.`, "error");
+  } finally { uploadButton.disabled = !selectedDatabaseFile; uploadButton.textContent = "Upload database →"; }
+});
+
+// Groq key UX: never persist the secret in browser storage. The backend must accept
+// X-Groq-API-Key and use it server-side; configure CORS to allow this header.
+const groqInput = $("groqApiKey");
+const groqStatus = $("groqStatus");
+$("saveGroqKeyBtn").addEventListener("click", () => {
+  const value = groqInput.value.trim();
+  if (!value) { groqApiKey = ""; groqStatus.textContent = "Enter a Groq API key first, or leave it blank to use the server-configured key."; groqStatus.className = "upload-status error"; return; }
+  if (!value.startsWith("gsk_")) { groqStatus.textContent = "This key does not start with gsk_. Check that you copied a Groq API key."; groqStatus.className = "upload-status error"; return; }
+  groqApiKey = value; groqInput.value = ""; groqInput.placeholder = "Key loaded for this page session";
+  groqStatus.textContent = "Custom Groq key is ready for analysis in this page session. It will be sent only to your configured Java backend.";
+  groqStatus.className = "upload-status success";
+});
+$("clearGroqKeyBtn").addEventListener("click", () => {
+  groqApiKey = ""; groqInput.value = ""; groqInput.placeholder = "gsk_••••••••••••••••••••••••";
+  groqStatus.textContent = "Custom key cleared. Your backend may use its server-configured key.";
+  groqStatus.className = "upload-status";
+});
+$("toggleGroqVisibility").addEventListener("click", () => {
+  const reveal = groqInput.type === "password"; groqInput.type = reveal ? "text" : "password";
+  $("toggleGroqVisibility").textContent = reveal ? "Hide" : "Show";
+  $("toggleGroqVisibility").setAttribute("aria-label", reveal ? "Hide API key" : "Show API key");
+});
+
+questionInput.addEventListener("input", () => { $("questionCount").textContent = `${questionInput.value.length} characters`; });
+document.querySelectorAll(".example-chip").forEach(btn => btn.addEventListener("click", () => {
+  questionInput.value = btn.dataset.question;
+  questionInput.dispatchEvent(new Event("input"));
+  questionInput.focus();
+}));
+form.addEventListener("submit", event => { event.preventDefault(); submitQuestion(questionInput.value); });
+$("clearBtn").addEventListener("click", () => { questionInput.value = ""; questionInput.dispatchEvent(new Event("input")); questionInput.focus(); });
+$("followupBtn").addEventListener("click", () => {
+  questionInput.value = "Now only for 2023";
+  questionInput.dispatchEvent(new Event("input"));
+  questionInput.focus();
+  $("question").scrollIntoView({behavior:"smooth", block:"center"});
+});
+$("toggleSqlBtn").addEventListener("click", () => {
+  const isHidden = $("sqlPanel").classList.toggle("hidden");
+  $("toggleSqlBtn").textContent = isHidden ? "View SQL" : "Hide SQL";
+});
+$("copyAnswerBtn").addEventListener("click", async () => {
+  if (!lastAnswer) return;
+  const content = [
+    $("answerTitle").textContent, $("answerText").textContent,
+    $("sqlCode").textContent, $("evidenceText").textContent
+  ].join("\n\n");
+  try { await navigator.clipboard.writeText(content); $("copyAnswerBtn").textContent = "Copied!"; setTimeout(() => $("copyAnswerBtn").textContent = "Copy answer", 1400); }
+  catch { window.prompt("Copy report:", content); }
+});
+function switchView(name) {
+  document.querySelectorAll(".view").forEach(v => v.classList.add("hidden"));
+  $(`view-${name}`).classList.remove("hidden");
+  document.querySelectorAll(".side-link").forEach(b => b.classList.toggle("active", b.dataset.view === name));
+  $("crumb").textContent = ({ask:"Ask your data",schema:"Schema explorer",history:"Query history"})[name] || "Workspace";
+}
+document.querySelectorAll(".side-link").forEach(btn => btn.addEventListener("click", () => switchView(btn.dataset.view)));
+document.querySelectorAll("[data-view-link]").forEach(btn => btn.addEventListener("click", () => switchView(btn.dataset.viewLink)));
+$("clearHistoryBtn").addEventListener("click", () => { history = []; renderHistory(); });
+$("refreshSchemaBtn").addEventListener("click", async () => {
+  const btn = $("refreshSchemaBtn"); btn.disabled = true; btn.textContent = "Refreshing…";
+  try {
+    const response = await fetch(SCHEMA_URL);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    $("sourceStat").textContent = data.sourceName || data.name || "Connected database";
+    $("connectionText").textContent = "Schema refreshed from Java API";
+    alert("Schema endpoint responded. Wire its table metadata into this explorer if your response structure differs.");
+  } catch {
+    alert("Schema API is not connected yet. The displayed schema is illustrative demo content.");
+  } finally { btn.disabled = false; btn.textContent = "Refresh schema"; }
+});
+
+  </script>
+
+<script>
+// Lightweight 3D card tilt. Disabled on touch devices and for reduced-motion preferences.
+(() => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || window.matchMedia('(pointer: coarse)').matches) return;
+  const selectors = '.stat-card, .content-grid > .card, .source-card, .results-card, .bottom-grid .card';
+  document.querySelectorAll(selectors).forEach(card => {
+    card.addEventListener('pointermove', e => {
+      if (e.pointerType !== 'mouse') return;
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width;
+      const y = (e.clientY - r.top) / r.height;
+      const rx = (0.5 - y) * 2.2;
+      const ry = (x - 0.5) * 2.8;
+      card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-2px)`;
+    });
+    card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+  });
+})();
+</script>
+
+</body>
+</html>
